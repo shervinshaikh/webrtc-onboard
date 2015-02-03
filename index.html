@@ -5,14 +5,28 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
   </head>
 	<body>
+    <div class="text-center">
+      <h3>Shervin WebRTC Onboard</h3>
+      <div class="bg-danger">
+        ID: <b id="pid"></b><br/>
+      </div>
+      Connect to peer: <input type="text" id="rid" placeholder="Someone else's ID"/>
+      <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"><br/><br/>
 
+      <form id="send">
+        <input type="text" id="text" placeholder="Enter message"><input class="btn btn-success btn-sm" type="submit" value="Send to selected peers">
+      </form>
+      <button class="btn btn-danger btn-sm" id="close">Close selected connections</button><br/>
+    </div>
+    <div id="connections"></div>
   </body>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="//webrtc-experiment.com/DataChannel.js"></script>
-  <script src="webrtc.js"></script>
+  <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  <!--script src="/socket.io/socket.io.js"></script-->
+  <script src="/webrtc.js"></script>
 
   <script>
-    var socket = io();
+    // var socket = io();
   </script>
 </html>
