@@ -5,9 +5,7 @@ var app = express();
 var server = require('http').Server(app);
 // var io = require('socket.io')(server);
 
-
-
-var PORT = 3000;
+app.set('port', (process.env.PORT || 5000));
 
 // Serve static files from directory
 app.use(express.static(__dirname + "/public"));
@@ -34,6 +32,6 @@ app.get('/', function (req, res){
 //   console.log('a user connected');
 // });
 
-server.listen(PORT, function(){
-  console.log("Listening on:", PORT);
+server.listen(app.get('port'), function(){
+  console.log("Listening on:", app.get('port'));
 });
