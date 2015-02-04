@@ -1,124 +1,155 @@
-var peer = new Peer({
-  key: 'smyszcbxlpk9ms4i',
-  debug: 3,
-  logFunction: function() {
-    var copy = Array.prototype.slice.call(arguments).join(' ');
-    console.log(copy);
-  }
-});
-// You can pick your own id
-// or omit the id if you want to get a random one from the server.
+var RTCPeerConnection = null;
+var getUserMedia = null;
+var attachMediaStream = null;
+var reattachMediaStream = null;
 
-// Show ID
-var connectedPeers = {};
-peer.on('open', function(id){
-  $('#pid').text(id);
-});
+var fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections");
 
-// Await connections
-peer.on('connection', connect);
-peer.on('error', function(err) {
-  console.log(err);
-})
+if (navigator.webkitGetUserMedia) {
+  console.log("This appears to be Chrome");
+} else {
+  console.log("We're screwed!");
+  // to support Firefox use "moz" as a prefix instead of webkit
+}
 
-// Handle a connection object.
-function connect(c) {
-  // Handle a chat connection.
-  if (c.label === 'chat') {
-    var chatbox = $('<table class="table"></table>').addClass('connection').addClass('active').attr('id', c.peer);
-    var header = $('<h3></h3>').html('Chat with <strong>' + c.peer + '</strong>');
-    var messages = $('<div><em>Peer connected.</em></div>').addClass('messages');
-    chatbox.append(header);
-    chatbox.append(messages);
- 
-    // Select connection handler.
-    chatbox.on('click', function() {
-      if ($(this).attr('class').indexOf('active') === -1) {
-        $(this).addClass('active');
-      } else {
-        $(this).removeClass('active');
-      }
-    });
-    $('.filler').hide();
-    $('#connections').append(chatbox);
-    c.on('data', function(data) {
-      messages.append('<div><b class="peer">' + c.peer + '</b>: ' + data +
-        '</div>');
-        });
-        c.on('close', function() {
-          alert(c.peer + ' has left the chat.');
-          chatbox.remove();
-          if ($('.connection').length === 0) {
-            $('.filler').show();
-          }
-          delete connectedPeers[c.peer];
-        });
-  }
-  connectedPeers[c.peer] = 1;
+var config = {
+  iceServers: [
+    {url: "stun:23.21.150.121"},
+    {url: "stun:stun.l.google.com:19302"}
+  ]
+};
+
+// Firefox support
+// var options = {
+//     optional: [
+//         {DtlsSrtpKeyAgreement: true},  // Chrome and Firefox to interperate
+//         {RtpDataChannels: true}        // use DataChannels API on Firefox
+//     ]
+// }
+
+var pc = new webkitRTCPeerConnection(config);
+window.lc = pc;
+var pcRef = null;
+var pcID = null;
+var local = null;
+
+pc.onicecandidate = function(e) {
+  // candidate exists in e.candidate
+  if(e.candidate == null) { return; }
+  // send("icecandidate", JSON.stringify(e.candidate));
+  // pcRef = fb.push({
+  fb.set({
+    icecandidate: JSON.stringify(e.candidate)
+  });
+  // pcID = pcRef.key();
+
+  console.log(JSON.stringify(e.candidate));
+  pc.onicecandidate = null;
 }
 
 
-$(document).ready(function() {
-  // Connect to a peer
-  $('#connect').click(function() {
-    var requestedPeer = $('#rid').val();
-    if (!connectedPeers[requestedPeer]) {
-      // Create chat connection
-      var c = peer.connect(requestedPeer, {
-        label: 'chat',
-        serialization: 'none',
-        metadata: {message: 'hi i want to chat with you!'}
-      });
-      c.on('open', function() {
-        connect(c);
-      });
-      c.on('error', function(err) { alert(err); });
-    }
-    connectedPeers[requestedPeer] = 1;
-  });
-  // Close a connection.
-  $('#close').click(function() {
-    eachActiveConnection(function(c) {
-      c.close();
-    });
-  });
-  // Send a chat message to all active connections.
-  $('#send').submit(function(e) {
-    e.preventDefault();
-    // For each active connection, send the message.
-    var msg = $('#text').val();
-    eachActiveConnection(function(c, $c) {
-      if (c.label === 'chat') {
-        c.send(msg);
-        $c.find('.messages').append('<div><b class="you">You: </b>' + msg
-          + '</div>');
-      }
-    });
-    $('#text').val('');
-    $('#text').focus();
-  });
-  // Goes through each active peer and calls FN on its connections.
-  function eachActiveConnection(fn) {
-    var actives = $('.active');
-    var checkedIds = {};
-    actives.each(function() {
-      var peerId = $(this).attr('id');
-      if (!checkedIds[peerId]) {
-        var conns = peer.connections[peerId];
-        for (var i = 0, ii = conns.length; i < ii; i += 1) {
-          var conn = conns[i];
-          fn(conn, $(this));
-        }
-      }
-      checkedIds[peerId] = 1;
-    });
+var errorHandler = function (err) {
+    console.error(err);
+};
+
+var constraints = null;
+// var constraints = {
+//     mandatory: {
+//         OfferToReceiveAudio: true,
+//         OfferToReceiveVideo: true
+//     }
+// };
+
+
+fb.child("offer").on("value", function(snapshot) {
+  if(local){
+    local = false;
+    return;
   }
+  var offer = snapshot.val();
+  console.log("Got offer:");
+  console.log(offer);
+
+  offer = new RTCSessionDescription(offer);
+  pc.setRemoteDescription(offer, function(){
+    pc.createAnswer(function (answer) {
+      ps.setLocalDescription(answer);
+      console.warn("Answer!");
+      fb.set({
+        answer: answer
+      })
+    }, errorHandler, constraints);
+  });
+
+
 });
 
 
-// Clean up
-window.onunload = window.onbeforeunload = function(e) {
-  if (!!peer && !peer.destroyed) {
-    peer.destroy();
+// Options are not well supported on Chrome yet
+var channelOptions = {};
+// var channelOptions = {
+//   ordered: false, // do not guarantee order
+//   maxRetransmitTime: 3000, // in milliseconds
+// };
+
+// can wrap around try/catch block
+var channel = pc.createDataChannel("Shervin", channelOptions);
+
+channel.onerror = function (err) {
+  console.error("Channel Error:", err);
+};
+
+channel.onmessage = function(e) {
+  console.log("Got message:", e.data);
+};
+
+channel.onopen = function() {
+  console.info("Connection opened!");
+};
+
+channel.onclose = function() {
+  console.info("Other peer closed connection!");
+};
+
+
+
+pc.createOffer(function (offer) {
+  pc.setLocalDescription(offer);
+  console.log(offer);
+  console.log(JSON.stringify(offer));
+  fb.set({
+    offer: offer
+  });
+  local = true;
+}, errorHandler, constraints);
+
+
+// ?????????
+// Attach a media stream to an element. 
+attachMediaStream = function(element, stream) {
+  if (typeof element.srcObject !== 'undefined') {
+    element.srcObject = stream;
+  } else if (typeof element.mozSrcObject !== 'undefined') {
+    element.mozSrcObject = stream;
+  } else if (typeof element.src !== 'undefined') {
+    element.src = URL.createObjectURL(stream);
+  } else {
+    console.log('Error attaching stream to element.');
   }
 };
+
+// ?????????
+reattachMediaStream = function(to, from) {
+  to.src = from.src;
+};
+
+
+
+
+function trace(text) {
+  // This function is used for logging.
+  if (text[text.length - 1] == '\n') {
+    text = text.substring(0, text.length - 1);
+  }
+  console.log((performance.now() / 1000).toFixed(3) + ": " + text);
+}
