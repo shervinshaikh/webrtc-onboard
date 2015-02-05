@@ -2,10 +2,12 @@ var fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections");
 var announceRef = fb.child('announce');
 var messageRef = fb.child('messages');
 
+
 var id = Date.now();
 $('#pid').text(id);
 var remote = null;
 var sharedKey = $('#rid').val();
+var chatRef = fb.child('chat').child(sharedKey);
 var running = false;
 
 if (navigator.webkitGetUserMedia) {
@@ -210,13 +212,31 @@ announcePresence();
 $('#send').submit(function(e) {
   e.preventDefault();
   var msg = $('#text').val();
-  channel.send(msg);
-  $('#connections').append('<p><b>You: </b>' + msg + '</p>');
-})
+  // channel.send(msg);
+  console.log(msg);
+  chatRef.push({
+    sender: id,
+    text: msg
+  });
+});
+
+var childAdded = chatRef.on('child_added', function(snapshot) {
+  var data = snapshot.val();
+  $('#messages').append('<p><b>' + data.sender + ': </b>' + data.text + '</p>');
+});
 
 $('#connect').click(function(){
   console.log('click');
   sharedKey = $('#rid').val();
+  chatRef.off('child_added', childAdded);
+  $('#messages').empty();
+  $('#connections').empty();
+
+  chatRef = fb.child('chat').child(sharedKey);
+  childAdded = chatRef.on('child_added', function(snapshot) {
+    var data = snapshot.val();
+    $('#messages').append('<p><b>' + data.sender + ': </b>' + data.text + '</p>');
+  });
   announcePresence();
 });
 
