@@ -240,6 +240,10 @@ $('#connect').click(function(){
   announcePresence();
 });
 
+$('#clear').click(function(){
+  chatRef.remove();
+  $('#messages').empty();
+});
 
 // var RTCPeerConnection = null;
 // var getUserMedia = null;
