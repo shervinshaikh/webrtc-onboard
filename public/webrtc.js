@@ -214,6 +214,12 @@ $('#send').submit(function(e) {
   $('#connections').append('<p><b>You: </b>' + msg + '</p>');
 })
 
+$('#connect').click(function(){
+  console.log('click');
+  sharedKey = $('#rid').val();
+  announcePresence();
+});
+
 
 // var RTCPeerConnection = null;
 // var getUserMedia = null;
