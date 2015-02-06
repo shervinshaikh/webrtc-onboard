@@ -13,13 +13,23 @@
       Connect to Room: <input type="text" id="rid" placeholder="Someone else's ID" value="shervinChannel"></input>
       <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"><br/><br/>
 
+      <video id="localVideo" autoplay></video>
+      <video id="remoteVideo" autoplay></video>
+
+      <div>
+        <!--button id="start" class="btn btn-sm btn-primary">Start</button-->
+        <button id="call" class="btn btn-sm btn-success">Call</button>
+        <button id="hangup" class="btn btn-sm btn-danger">End</button>
+      </div>
+
+      <hr>
       <form id="send">
-        <input type="text" id="text" placeholder="Enter message"><input class="btn btn-success btn-sm" type="submit" value="Send to selected peers">
+        <input type="text" id="text" placeholder="Enter message"><input class="btn btn-default btn-sm" type="submit" value="Send">
       </form>
     </div>
     <div id="connections"></div>
     <hr>
-    <button class="btn btn-danger btn-sm" id="clear">Clear Chat</button><br/>
+    <button class="btn btn-danger btn-xs" id="clear">Clear Chat</button><br/>
     <div id="messages"></div>
   </body>
 
