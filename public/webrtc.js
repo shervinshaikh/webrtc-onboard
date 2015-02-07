@@ -11,6 +11,7 @@ var sharedKey = $('#rid').val();
 var chatRef = fb.child('chat').child(sharedKey);
 // var running = false;
 var localStream = null;
+var remoteStream = null;
 
 if (navigator.webkitGetUserMedia) {
   console.log("This appears to be Chrome");
@@ -22,9 +23,9 @@ if (navigator.webkitGetUserMedia) {
 
 
 // ANOUNCE
+// What happens when sharedKey changes for WebRTC?
 var announceChild = null;
 var announcePresence = function() {
-  console.log(sharedKey);
   announceRef.remove(function() {
     announceChild = announceRef.push({
       sharedKey: sharedKey, 
@@ -37,27 +38,18 @@ var announcePresence = function() {
   });
 };
 
-var first = true;
 announceRef.on('child_added', function(snapshot){
-  // if(first){
-  //   first = false;
-  //   return;
-  // }
   var data = snapshot.val();
-  console.log(data);
   if(data.sharedKey === sharedKey && data.id !== id){
     console.log("Matched with", data.id);
-    // running = true;
     remote = data.id;
 
     // $('#call')[0].disabled = false;
-    beginWebRTC();
-    sendMessage(localStream);
-    console.log('SENDING stream to' + remote);
+    beginWebRTC(pc1);
+    // sendMessage(localStream);
+    // console.log('SENDING stream to' + remote);
 
-
-    // let them know we're matched
-
+    // TODO: let them know we're matched on Firebase
   }
 });
 
@@ -73,7 +65,7 @@ var sendMessage = function(message) {
 
 var config = {
   iceServers: [
-    {url: "stun:23.21.150.121"},
+    // {url: "stun:23.21.150.121"},
     {url: "stun:stun.l.google.com:19302"}
   ]
 };
@@ -90,52 +82,10 @@ var constraints = {
 };
 
 
-var beginWebRTC = function(){
-  // initiateConnection();
-  // sendCandidates();
-
-  // pc.addStream(localStream);
-  pc.createOffer(function (offer) {
-    console.log('SENDING offer setLocalDescription(offer) to', remote);
-    pc.setLocalDescription(offer);
-    sendMessage(offer);
-  }, errorHandler, constraints);
-}
-
-var sendCandidates = function() {
-  pc.onaddstream = function(e) {
-    console.log('REMOTE stream coming in!');
-    console.log(e.stream);
-    $('#remoteVideo')[0].src = URL.createObjectURL(e.stream); 
-  };
-  // pc.onremotestream = function(e) {
-  //   console.log('onremotestream');
-  //   $('#remoteVideo')[0].src = URL.createObjectURL(e.stream); 
-  // };
-
-  pc.onicecandidatestatechange = function() {
-    if(pc.iceConnectionState === 'disconnected'){
-      console.log('Client disconnected');
-      announcePresence();
-    }
-  }
-
-  pc.onicecandidate = function(e) {
-    // candidate exists in e.candidate
-    var candidate = e.candidate;
-    if(candidate){
-      candidate.type = 'candidate';
-      console.log('SENDING candidate onicecandidate(e) to', remote);
-      sendMessage(candidate);
-    }
-    // send("icecandidate", JSON.stringify(e.candidate));
-    // send only the first candidate
-    pc.onicecandidate = null;
-  }
-}
 
 // CONNECTION
-var pc = null;
+var pc1 = null;
+var pc2 = null;
 var channel = null;
 
 // Options are not well supported on Chrome yet
@@ -147,48 +97,91 @@ var channelOptions = {};
 
 var initiateConnection = function() {
   try {
-    pc = new webkitRTCPeerConnection(config);
+    pc1 = new webkitRTCPeerConnection(config);
+    pc2 = new webkitRTCPeerConnection(config);
   } catch (e) {
     console.error("Failed " + e.message)
   }
+
+  pc1.onaddstream = handleAddStream;
+  pc2.onaddstream = handleAddStream;
+  // pc1.onremotestream = function(e) {
+  //   console.log('onremotestream');
+  //   $('#remoteVideo')[0].src = URL.createObjectURL(e.stream); 
+  // };
+
+  pc1.onicecandidatestatechange = handleIceCandidateStateChange(pc1);
+  pc2.onicecandidatestatechange = handleIceCandidateStateChange(pc2);
+
+  pc1.onicecandidate = function(e) { 
+    handleIceCandidate(e, pc1, true);
+  };
+  pc2.onicecandidate = function(e) {
+    handleIceCandidate(e, pc2, false);
+  };
 }
 
-announcePresence();
-// $('#start').click(function(){
+var handleAddStream = function(e) {
+  console.log('REMOTE stream coming in!');
+  console.log(e.stream);
+  $('#remoteVideo')[0].src = URL.createObjectURL(e.stream); 
+};
+
+var handleIceCandidateStateChange = function(peerConnection) {
+  if(peerConnection.iceConnectionState === 'disconnected'){
+    console.log('Client disconnected');
+    announcePresence();
+  }
+}
+
+var handleIceCandidate = function(e, peerConnection, incoming) {
+  // candidate exists in e.candidate
+  // console.warn(pc);
+  var candidate = e.candidate;
+  if(candidate){
+    // console.warn(candidate);
+    candidate.type = 'candidate';
+    candidate.incoming = incoming;
+    console.log('SENDING candidate onicecandidate(e) to', remote);
+    sendMessage(candidate);
+  }
+  // send only the first candidate
+  peerConnection.onicecandidate = null;
+}
+
+
+  announcePresence();
+  initiateConnection();
+
 navigator.webkitGetUserMedia({
   "audio": true,
   "video": true
 }, function (stream){
-  initiateConnection();
-  sendCandidates();
 
-  // pc.onaddstream({stream: stream});
-  pc.addStream(stream);
+
+  // TODO: What if connection isn't ready yet??
+  pc1.addStream(stream);
   $('#localVideo')[0].src = URL.createObjectURL(stream);
   console.log(stream);
-
-  // beginWebRTC();
-  // pc.addStream(stream);
 
   localStream = stream;
   localStream.type = 'stream';
 }, function(e){
   console.error(e);
 });
-// });
-
-
-$('#call').click(function(){
-  // announcePresence();
-  beginWebRTC();
-  sendMessage(localStream);
-  console.log('SENDING stream to' + remote);
-});
 
 
 
 
 
+
+var beginWebRTC = function(peerConnection){
+  peerConnection.createOffer(function (offer) {
+    console.log('SENDING offer setLocalDescription(offer) to', remote);
+    peerConnection.setLocalDescription(offer);
+    sendMessage(offer);
+  }, errorHandler, constraints);
+}
 
 messageRef.child(id).on('child_added', function(snapshot){
   var data = snapshot.val();
@@ -200,33 +193,44 @@ messageRef.child(id).on('child_added', function(snapshot){
       // running = true;
       remote = data.sender;
 
-      initiateConnection();
-      sendCandidates();
-
       console.log("RECEIVED offer setRemoteDescription(offer)", "from", data.sender);
-      pc.setRemoteDescription(new RTCSessionDescription(data));//, function(){
-      pc.createAnswer(function (answer) {
+      pc2.setRemoteDescription(new RTCSessionDescription(data));//, function(){
+      pc2.createAnswer(function (answer) {
         console.log("SENDING answer setLocalDescription(answer)", "to", data.sender);
-        pc.setLocalDescription(answer);
+        pc2.setLocalDescription(answer);
         sendMessage(answer);
         // console.warn("Sending answer to", data.sender);
-      }, errorHandler, constraints);  
+      }, errorHandler, constraints);
       // });
       break;
     // Answer response to our offer we gave to remote client
     case 'answer':
       console.log("RECEIVED answer setRemoteDescription(answer)", "from", data.sender);
-      pc.setRemoteDescription(new RTCSessionDescription(data));
+      pc1.setRemoteDescription(new RTCSessionDescription(data));
       break;
     // ICE candidate notification from remote client
     case 'candidate':
       // if(running) 
       console.log("RECEIVED candidate addIceCandidate(candidate)", "from", data.sender);
-      pc.addIceCandidate(new RTCIceCandidate(data));
+      // pc1 = outgoing
+      // pc2 = incoming
+      if(data.incoming){
+        pc2.addIceCandidate(new RTCIceCandidate(data));
+      } else {
+        pc1.addIceCandidate(new RTCIceCandidate(data));
+      }
       break;
-    case 'stream':
-      console.log("..RECEIVED stream addStream(stream)", "from", data.sender);
-      pc.addStream(data);
+    case 'leave':
+      console.warn("LEAVING>........");
+      pc1.close();
+      pc2.close();
+
+      // set to null
+      // pc1 = null;
+      // pc2 = null;
+      initiateConnection();
+      // console.log("..RECEIVED stream addStream(stream)", "from", data.sender);
+      // pc2.addStream(data);
       // console.log("received stream....");
       break;
   }
@@ -274,7 +278,11 @@ $('#clear').click(function(){
 
 
 window.onbeforeunload = function(e) {
-  pc.close();
+  // TODO: send Firebase to close
+  sendMessage({type: 'leave'});
+
+  pc1.close();
+  pc2.close();
   // announceChild.remove();
 };
 
