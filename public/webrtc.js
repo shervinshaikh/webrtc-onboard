@@ -11,7 +11,7 @@ setFirebaseValues();
 
 var id = Date.now() % 100000;
 var remoteId, localStream, remoteStream = null;
-// TODO: remove '0'
+// TODO: Removes '0'
 $('#pid').text(Math.floor(id/1000) + '-' + id%1000);
 
 // TODO: add Firefox support and notify if browser not supported
@@ -23,8 +23,8 @@ if (navigator.webkitGetUserMedia) {
 }
 
 
-// ANOUNCE
-// TODO: What happens when sharedKey changes for WebRTC?
+// ANOUNCEMENT
+// TODO: Changing sharedKey does not work
 var announceChild = null;
 var announcePresence = function() {
   announceChild = announceRef.push({
@@ -142,11 +142,8 @@ var handleIceCandidateStateChange = function(peerConnection) {
 };
 
 var handleIceCandidate = function(e, peerConnection, incoming) {
-  // candidate exists in e.candidate
-  // console.warn(pc);
   var candidate = e.candidate;
   if(candidate){
-    // console.warn(candidate);
     candidate.type = 'candidate';
     candidate.incoming = incoming;
     console.log('SENDING candidate onicecandidate(e) to', remoteId);
@@ -162,10 +159,7 @@ var onSdpSuccess = function(e){
 
 var onSdpFailure = function(e) {
   console.error(e);
-  // announceRef.remove();
-  // location.reload();
 };
-
 
 
 
@@ -262,7 +256,6 @@ var appendMessage = function(sender, text){
   }
 }
 
-
 var handleChatMessage = function(snapshot) {
   var data = snapshot.val();
   appendMessage(data.sender, data.text);
@@ -271,7 +264,7 @@ var handleChatMessage = function(snapshot) {
 var chatChildAdded = chatRef.on('child_added', handleChatMessage);
 
 $('#connect').click(function(){
-  // TODO: fix this
+  // TODO: Only one user gets to see both video feeds
   endCall();
 
   sharedKey = $('#rid').val();
@@ -297,7 +290,6 @@ $('#clear').click(function(){
 });
 
 
-
 var endCall = function(){
   $('#remoteVideo')[0].src = "";
   remoteId = null;
@@ -315,15 +307,14 @@ $('#hangup').click(function(){
 });
 
 window.onbeforeunload = function(e) {
-  // TODO: getUserMedia failes when Firebase doesn't have any announcements, still an issue?
   endCall();
 
+  // Clean up messages on Firebase
   for (var i = messages.length - 1; i >= 0; i--) {
     messages[i].remove();
   };
 };
 
-window.messageRef = messageRef;
-// messageRef.orderByChild('sender').equalTo(96570).remove();
+
 initiateConnection();
 announcePresence();

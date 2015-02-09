@@ -3,14 +3,12 @@
   <title>WebRTC Chat</title>
 	<body>
     <div class="text-center" id="info">
-      <!-- <div class="bg"> -->
-        <p>Your ID: <b id="pid"></b><br/></p>
-      
-        <p>Room: <input type="text" id="rid" placeholder="Someone else's ID" value="shervin" style="color: black; width: 100px"></input>
-        <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"></p>
+      <p>Your ID: <b id="pid"></b><br/></p>
+    
+      <p>Room: <input type="text" id="rid" placeholder="Someone else's ID" value="shervin" style="color: black; width: 100px"></input>
+      <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"></p>
 
-        <p><button id="hangup" class="btn btn-xs btn-danger">Leave</button></p>
-      <!-- </div> -->
+      <p><button id="hangup" class="btn btn-xs btn-danger">Leave</button></p>
 
       <hr>
       <form id="send">
@@ -19,8 +17,7 @@
 
       <br/>
       <div id="messages"></div>
-      <p><button class="btn btn-danger btn-xs" id="clear">Clear Chat</button><br/></p>
-      
+      <p><button class="btn btn-danger btn-xs" id="clear">Clear Chat</button><br/></p>      
     </div>
 
     <video id="localVideo" autoplay muted></video>
