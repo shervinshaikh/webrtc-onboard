@@ -2,16 +2,14 @@ var fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections");
 var announceRef = fb.child('announce');
 var messageRef = fb.child('messages');
 
-
-var id = Date.now();
-$('#pid').text(id);
-$('#call')[0].disabled = true;
-var remote = null;
 var sharedKey = $('#rid').val();
 var chatRef = fb.child('chat').child(sharedKey);
-// var running = false;
+
+var id = Date.now();
+var remoteId = null;
 var localStream = null;
 var remoteStream = null;
+$('#pid').text(id);
 
 if (navigator.webkitGetUserMedia) {
   console.log("This appears to be Chrome");
@@ -23,18 +21,27 @@ if (navigator.webkitGetUserMedia) {
 
 
 // ANOUNCE
-// What happens when sharedKey changes for WebRTC?
+// TODO: What happens when sharedKey changes for WebRTC?
 var announceChild = null;
 var announcePresence = function() {
-  announceRef.remove(function() {
-    announceChild = announceRef.push({
-      sharedKey: sharedKey, 
-      id: id
-    });
+  announceChild = announceRef.push({
+    sharedKey: sharedKey, 
+    id: id
   });
   console.log("Announced:", {
     sharedKey: sharedKey, 
     id: id
+  });
+
+  navigator.webkitGetUserMedia({
+    "audio": true,
+    "video": true
+  }, function (stream){
+    $('#localVideo')[0].src = URL.createObjectURL(stream);
+    localStream = stream;
+    beginWebRTC(outgoingPC);
+  }, function(e){
+    console.error(e);
   });
 };
 
@@ -42,14 +49,9 @@ announceRef.on('child_added', function(snapshot){
   var data = snapshot.val();
   if(data.sharedKey === sharedKey && data.id !== id){
     console.log("Matched with", data.id);
-    remote = data.id;
+    remoteId = data.id;
 
-    // $('#call')[0].disabled = false;
-    beginWebRTC(pc1);
-    // sendMessage(localStream);
-    // console.log('SENDING stream to' + remote);
-
-    // TODO: let them know we're matched on Firebase
+    beginWebRTC(outgoingPC);
   }
 });
 
@@ -58,14 +60,14 @@ announceRef.on('child_added', function(snapshot){
 // SENDING MESSAGES
 var sendMessage = function(message) {
   message.sender = id;
-  messageRef.child(remote).push(message);
+  messageRef.child(remoteId).push(message);
 }
 
 
-
+// CONNECTION
 var config = {
   iceServers: [
-    // {url: "stun:23.21.150.121"},
+    {url: "stun:23.21.150.121"},
     {url: "stun:stun.l.google.com:19302"}
   ]
 };
@@ -82,11 +84,10 @@ var constraints = {
 };
 
 
-
-// CONNECTION
-var pc1 = null;
-var pc2 = null;
+var outgoingPC = null;
+var incomingPC = null;
 var channel = null;
+var isConnectionReady = false;
 
 // Options are not well supported on Chrome yet
 var channelOptions = {};
@@ -97,28 +98,28 @@ var channelOptions = {};
 
 var initiateConnection = function() {
   try {
-    pc1 = new webkitRTCPeerConnection(config);
-    pc2 = new webkitRTCPeerConnection(config);
+    outgoingPC = new webkitRTCPeerConnection(config);
+    incomingPC = new webkitRTCPeerConnection(config);
   } catch (e) {
-    console.error("Failed " + e.message)
+    console.error("Failed " + e.message);
+    return;
   }
 
-  pc1.onaddstream = handleAddStream;
-  pc2.onaddstream = handleAddStream;
-  // pc1.onremotestream = function(e) {
-  //   console.log('onremotestream');
-  //   $('#remoteVideo')[0].src = URL.createObjectURL(e.stream); 
-  // };
+  outgoingPC.onaddstream = handleAddStream;
+  incomingPC.onaddstream = handleAddStream;
 
-  pc1.onicecandidatestatechange = handleIceCandidateStateChange(pc1);
-  pc2.onicecandidatestatechange = handleIceCandidateStateChange(pc2);
+  outgoingPC.onicecandidatestatechange = handleIceCandidateStateChange(outgoingPC);
+  incomingPC.onicecandidatestatechange = handleIceCandidateStateChange(incomingPC);
 
-  pc1.onicecandidate = function(e) { 
-    handleIceCandidate(e, pc1, true);
+  outgoingPC.onicecandidate = function(e) { 
+    handleIceCandidate(e, outgoingPC, true);
   };
-  pc2.onicecandidate = function(e) {
-    handleIceCandidate(e, pc2, false);
+  incomingPC.onicecandidate = function(e) {
+    handleIceCandidate(e, incomingPC, false);
   };
+
+  isConnectionReady = true;
+  beginWebRTC(outgoingPC);
 }
 
 var handleAddStream = function(e) {
@@ -132,7 +133,7 @@ var handleIceCandidateStateChange = function(peerConnection) {
     console.log('Client disconnected');
     announcePresence();
   }
-}
+};
 
 var handleIceCandidate = function(e, peerConnection, incoming) {
   // candidate exists in e.candidate
@@ -142,33 +143,20 @@ var handleIceCandidate = function(e, peerConnection, incoming) {
     // console.warn(candidate);
     candidate.type = 'candidate';
     candidate.incoming = incoming;
-    console.log('SENDING candidate onicecandidate(e) to', remote);
+    console.log('SENDING candidate onicecandidate(e) to', remoteId);
     sendMessage(candidate);
   }
   // send only the first candidate
   peerConnection.onicecandidate = null;
-}
+};
 
+var onSdpSuccess = function(e){
+  console.log('sdp success');
+};
 
-  announcePresence();
-  initiateConnection();
-
-navigator.webkitGetUserMedia({
-  "audio": true,
-  "video": true
-}, function (stream){
-
-
-  // TODO: What if connection isn't ready yet??
-  pc1.addStream(stream);
-  $('#localVideo')[0].src = URL.createObjectURL(stream);
-  console.log(stream);
-
-  localStream = stream;
-  localStream.type = 'stream';
-}, function(e){
+var onSdpFailure = function(e) {
   console.error(e);
-});
+};
 
 
 
@@ -176,68 +164,68 @@ navigator.webkitGetUserMedia({
 
 
 var beginWebRTC = function(peerConnection){
+  if(localStream === null || !isConnectionReady || remoteId === null){
+    // everything is not ready yet so return
+    return;
+  }
+  outgoingPC.addStream(localStream);
+
   peerConnection.createOffer(function (offer) {
-    console.log('SENDING offer setLocalDescription(offer) to', remote);
-    peerConnection.setLocalDescription(offer);
+    console.log('SENDING offer setLocalDescription(offer) to', remoteId);
+    peerConnection.setLocalDescription(offer, onSdpSuccess, onSdpFailure);
     sendMessage(offer);
   }, errorHandler, constraints);
 }
 
 messageRef.child(id).on('child_added', function(snapshot){
   var data = snapshot.val();
-  // console.log(id, data.sender);
   // console.log("MESSAGE", data.type, "from", data.sender);
   switch (data.type) {
     // Remote client handles WebRTC request
     case 'offer':
-      // running = true;
-      remote = data.sender;
+      remoteId = data.sender;
 
       console.log("RECEIVED offer setRemoteDescription(offer)", "from", data.sender);
-      pc2.setRemoteDescription(new RTCSessionDescription(data));//, function(){
-      pc2.createAnswer(function (answer) {
+      var sdp = new RTCSessionDescription(data)
+      incomingPC.setRemoteDescription(sdp, onSdpSuccess, onSdpFailure);
+
+      incomingPC.createAnswer(function (answer) {
         console.log("SENDING answer setLocalDescription(answer)", "to", data.sender);
-        pc2.setLocalDescription(answer);
+        incomingPC.setLocalDescription(answer, onSdpSuccess, onSdpFailure);
         sendMessage(answer);
-        // console.warn("Sending answer to", data.sender);
       }, errorHandler, constraints);
-      // });
       break;
     // Answer response to our offer we gave to remote client
     case 'answer':
       console.log("RECEIVED answer setRemoteDescription(answer)", "from", data.sender);
-      pc1.setRemoteDescription(new RTCSessionDescription(data));
+      var sdp = new RTCSessionDescription(data);
+      outgoingPC.setRemoteDescription(sdp, onSdpSuccess, onSdpFailure);
       break;
     // ICE candidate notification from remote client
     case 'candidate':
-      // if(running) 
       console.log("RECEIVED candidate addIceCandidate(candidate)", "from", data.sender);
-      // pc1 = outgoing
-      // pc2 = incoming
       if(data.incoming){
-        pc2.addIceCandidate(new RTCIceCandidate(data));
+        incomingPC.addIceCandidate(new RTCIceCandidate(data));
       } else {
-        pc1.addIceCandidate(new RTCIceCandidate(data));
+        outgoingPC.addIceCandidate(new RTCIceCandidate(data));
       }
       break;
     case 'leave':
-      console.warn("LEAVING>........");
-      pc1.close();
-      pc2.close();
+      console.warn("End call...");
+      $('#remoteVideo')[0].src = "";
 
-      // set to null
-      // pc1 = null;
-      // pc2 = null;
+      outgoingPC.close();
+      incomingPC.close();
+
+      remoteId = null;
       initiateConnection();
-      // console.log("..RECEIVED stream addStream(stream)", "from", data.sender);
-      // pc2.addStream(data);
-      // console.log("received stream....");
       break;
   }
 
 });
 
 
+// CHAT - sending/receiving messages through Firebase
 $('#send').submit(function(e) {
   e.preventDefault();
   var msg = $('#text').val();
@@ -278,35 +266,14 @@ $('#clear').click(function(){
 
 
 window.onbeforeunload = function(e) {
-  // TODO: send Firebase to close
+  // TODO: getUserMedia failes when Firebase doesn't have any announcements
   sendMessage({type: 'leave'});
 
-  pc1.close();
-  pc2.close();
-  // announceChild.remove();
+  outgoingPC.close();
+  incomingPC.close();
+  announceChild.remove();
 };
 
-// var RTCPeerConnection = null;
-// var getUserMedia = null;
-// var attachMediaStream = null;
-// var reattachMediaStream = null;
 
-// // ?????????
-// // Attach a media stream to an element. 
-// attachMediaStream = function(element, stream) {
-//   if (typeof element.srcObject !== 'undefined') {
-//     element.srcObject = stream;
-//   } else if (typeof element.mozSrcObject !== 'undefined') {
-//     element.mozSrcObject = stream;
-//   } else if (typeof element.src !== 'undefined') {
-//     element.src = URL.createObjectURL(stream);
-//   } else {
-//     console.log('Error attaching stream to element.');
-//   }
-// };
-
-// // ?????????
-// reattachMediaStream = function(to, from) {
-//   to.src = from.src;
-// };
-
+announcePresence();
+initiateConnection();
