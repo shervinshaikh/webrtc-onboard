@@ -11,8 +11,10 @@ setFirebaseValues();
 
 var id = Date.now() % 100000;
 var remoteId, localStream, remoteStream = null;
+// TODO: remove '0'
 $('#pid').text(Math.floor(id/1000) + '-' + id%1000);
 
+// TODO: add Firefox support and notify if browser not supported
 if (navigator.webkitGetUserMedia) {
   console.log("This appears to be Chrome");
 } else {
