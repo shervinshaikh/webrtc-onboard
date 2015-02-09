@@ -1,15 +1,17 @@
-var fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections");
-var announceRef = fb.child('announce');
-var messageRef = fb.child('messages');
+var fb, announceRef, messageRef, chatRef = null;
+var setFirebaseValues = function(){
+  fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections/" + sharedKey);
+  announceRef = fb.child('announce');
+  messageRef = fb.child('messages');
+  chatRef = fb.child('chat');  
+};
 
 var sharedKey = $('#rid').val();
-var chatRef = fb.child('chat').child(sharedKey);
+setFirebaseValues();
 
-var id = Date.now();
-var remoteId = null;
-var localStream = null;
-var remoteStream = null;
-$('#pid').text(id);
+var id = Date.now() % 100000;
+var remoteId, localStream, remoteStream = null;
+$('#pid').text(Math.floor(id/1000) + '-' + id%1000);
 
 if (navigator.webkitGetUserMedia) {
   console.log("This appears to be Chrome");
@@ -17,7 +19,6 @@ if (navigator.webkitGetUserMedia) {
   console.log("We're screwed!");
   // to support Firefox use "moz" as a prefix instead of webkit
 }
-
 
 
 // ANOUNCE
@@ -45,7 +46,8 @@ var announcePresence = function() {
   });
 };
 
-announceRef.on('child_added', function(snapshot){
+
+var handleAnnouncement = function(snapshot){
   var data = snapshot.val();
   if(data.sharedKey === sharedKey && data.id !== id){
     console.log("Matched with", data.id);
@@ -53,14 +55,16 @@ announceRef.on('child_added', function(snapshot){
 
     beginWebRTC(outgoingPC);
   }
-});
+}
 
+var announceChildAdded = announceRef.on('child_added', handleAnnouncement);
 
 
 // SENDING MESSAGES
+var messages = [];
 var sendMessage = function(message) {
   message.sender = id;
-  messageRef.child(remoteId).push(message);
+  messages.push(messageRef.push(message));
 }
 
 
@@ -156,6 +160,8 @@ var onSdpSuccess = function(e){
 
 var onSdpFailure = function(e) {
   console.error(e);
+  // announceRef.remove();
+  // location.reload();
 };
 
 
@@ -164,21 +170,27 @@ var onSdpFailure = function(e) {
 
 
 var beginWebRTC = function(peerConnection){
-  if(localStream === null || !isConnectionReady || remoteId === null){
-    // everything is not ready yet so return
-    return;
-  }
-  outgoingPC.addStream(localStream);
+  console.log(localStream);
+  console.log(isConnectionReady);
+  console.log(remoteId);
+  if(localStream && isConnectionReady && remoteId){
+    outgoingPC.addStream(localStream);
 
-  peerConnection.createOffer(function (offer) {
-    console.log('SENDING offer setLocalDescription(offer) to', remoteId);
-    peerConnection.setLocalDescription(offer, onSdpSuccess, onSdpFailure);
-    sendMessage(offer);
-  }, errorHandler, constraints);
+    peerConnection.createOffer(function (offer) {
+      console.log('SENDING offer setLocalDescription(offer) to', remoteId);
+      peerConnection.setLocalDescription(offer, onSdpSuccess, onSdpFailure);
+      sendMessage(offer);
+    }, errorHandler, constraints);
+  }
 }
 
-messageRef.child(id).on('child_added', function(snapshot){
+var handleMessage = function(snapshot){
+  if(firstMessage){
+    firstMessage = false;
+    return;
+  }
   var data = snapshot.val();
+  if(data.sender === id) return;
   // console.log("MESSAGE", data.type, "from", data.sender);
   switch (data.type) {
     // Remote client handles WebRTC request
@@ -218,11 +230,14 @@ messageRef.child(id).on('child_added', function(snapshot){
       incomingPC.close();
 
       remoteId = null;
+      isConnectionReady = false;
       initiateConnection();
       break;
   }
+}
 
-});
+var messageChildAdded = messageRef.on('child_added', handleMessage);
+var firstMessage = false;
 
 
 // CHAT - sending/receiving messages through Firebase
@@ -237,23 +252,40 @@ $('#send').submit(function(e) {
   });
 });
 
-var childAdded = chatRef.on('child_added', function(snapshot) {
+var appendMessage = function(sender, text){
+  if(sender === id){
+    $('#messages').append('<p class=\'localText\'><b>' + sender + ': </b>' + text + '</p>');
+  } else {
+    $('#messages').append('<p class=\'remoteText\'><b>' + sender + ': </b>' + text + '</p>');
+  }
+}
+
+
+var handleChatMessage = function(snapshot) {
   var data = snapshot.val();
-  $('#messages').append('<p><b>' + data.sender + ': </b>' + data.text + '</p>');
-});
+  appendMessage(data.sender, data.text);
+}
+
+var chatChildAdded = chatRef.on('child_added', handleChatMessage);
 
 $('#connect').click(function(){
-  console.log('click');
-  sharedKey = $('#rid').val();
-  chatRef.off('child_added', childAdded);
-  $('#messages').empty();
-  $('#connections').empty();
+  // TODO: fix this
+  endCall();
 
-  chatRef = fb.child('chat').child(sharedKey);
-  childAdded = chatRef.on('child_added', function(snapshot) {
-    var data = snapshot.val();
-    $('#messages').append('<p><b>' + data.sender + ': </b>' + data.text + '</p>');
-  });
+  sharedKey = $('#rid').val();
+  setFirebaseValues();
+  console.log('Connectiong to:', sharedKey)
+
+  chatRef.off('child_added', chatChildAdded);
+  announceRef.off('child_added', announceChildAdded);
+  messageRef.off('child_added', messageChildAdded);
+  $('#messages').empty();
+
+  chatChildAdded = chatRef.on('child_added', handleChatMessage);
+  announceChildAdded = announceRef.on('child_added', handleAnnouncement);
+  messageChildAdded = messageRef.endAt().limit(1).on('child_added', handleMessage);
+  
+  initiateConnection();
   announcePresence();
 });
 
@@ -264,16 +296,32 @@ $('#clear').click(function(){
 
 
 
+var endCall = function(){
+  $('#remoteVideo')[0].src = "";
+  remoteId = null;
+  isConnectionReady = false;
 
-window.onbeforeunload = function(e) {
-  // TODO: getUserMedia failes when Firebase doesn't have any announcements
   sendMessage({type: 'leave'});
 
   outgoingPC.close();
   incomingPC.close();
   announceChild.remove();
+}
+
+$('#hangup').click(function(){
+  endCall();
+});
+
+window.onbeforeunload = function(e) {
+  // TODO: getUserMedia failes when Firebase doesn't have any announcements, still an issue?
+  endCall();
+
+  for (var i = messages.length - 1; i >= 0; i--) {
+    messages[i].remove();
+  };
 };
 
-
-announcePresence();
+window.messageRef = messageRef;
+// messageRef.orderByChild('sender').equalTo(96570).remove();
 initiateConnection();
+announcePresence();

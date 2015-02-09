@@ -1,44 +1,36 @@
 <!DOCTYPE html>
 <html>
   <title>WebRTC Chat</title>
-  <head>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-  </head>
 	<body>
-    <div class="text-center">
-      <h3>Shervin WebRTC Onboard</h3>
-      <div class="bg-danger">
-        ID: <b id="pid"></b><br/>
-      </div>
-      Connect to Room: <input type="text" id="rid" placeholder="Someone else's ID" value="shervinChannel"></input>
-      <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"><br/><br/>
+    <div class="text-center" id="info">
+      <!-- <div class="bg"> -->
+        <p>Your ID: <b id="pid"></b><br/></p>
+      
+        <p>Room: <input type="text" id="rid" placeholder="Someone else's ID" value="shervin" style="color: black; width: 100px"></input>
+        <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"></p>
 
-      <video id="localVideo" autoplay></video>
-      <video id="remoteVideo" autoplay></video>
-
-      <div>
-        <!--button id="start" class="btn btn-sm btn-primary">Start</button-->
-        <button id="call" class="btn btn-sm btn-success">Call</button>
-        <button id="hangup" class="btn btn-sm btn-danger">End</button>
-      </div>
+        <p><button id="hangup" class="btn btn-xs btn-danger">Leave</button></p>
+      <!-- </div> -->
 
       <hr>
       <form id="send">
-        <input type="text" id="text" placeholder="Enter message"><input class="btn btn-default btn-sm" type="submit" value="Send">
+        <input type="text" id="text" placeholder="Enter message"><input class="btn btn-default btn-xs" type="submit" value="Send">
       </form>
+
+      <br/>
+      <div id="messages"></div>
+      <p><button class="btn btn-danger btn-xs" id="clear">Clear Chat</button><br/></p>
+      
     </div>
-    <div id="connections"></div>
-    <hr>
-    <button class="btn btn-danger btn-xs" id="clear">Clear Chat</button><br/>
-    <div id="messages"></div>
+
+    <video id="localVideo" autoplay></video>
+    <video id="remoteVideo" autoplay></video>
   </body>
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/main.css">
 
   <script src="//cdn.firebase.com/js/client/2.1.2/firebase.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
-  <!--script src="/socket.io/socket.io.js"></script-->
   <script src="/webrtc.js"></script>
-
-  <script>
-    // var socket = io();
-  </script>
 </html>

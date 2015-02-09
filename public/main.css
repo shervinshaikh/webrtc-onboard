@@ -1,0 +1,43 @@
+#remoteVideo {
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  display: block;
+  z-index: 1;
+  position: absolute;
+  object-fit: cover;
+  bottom: 0px;
+}
+
+#localVideo {
+  max-height: 20%;
+  max-width: 20%;
+  position: absolute;
+  border: 1px solid gray;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+}
+
+#info {
+  z-index: 3;
+  position: absolute;
+  background-color: rgba(0,0,0,0.7);
+  top: 20px;
+  left: 20px;
+  padding: 5px 10px 5px 10px;
+}
+
+p {
+  color: white;
+}
+
+.localText {
+  color: rgb(117, 117, 255);
+  text-align: right;
+}
+
+.remoteText {
+  text-align: left;
+}
