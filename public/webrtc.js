@@ -11,8 +11,8 @@ setFirebaseValues();
 
 var id = Date.now() % 100000;
 var remoteId, localStream, remoteStream = null;
-// TODO: Removes '0'
-$('#pid').text(Math.floor(id/1000) + '-' + id%1000);
+var stringId = id.toString();
+$('#pid').text(stringId.substr(0,3) + '-' + stringId.substr(3,6));
 
 // TODO: add Firefox support and notify if browser not supported
 if (navigator.webkitGetUserMedia) {
@@ -44,6 +44,7 @@ var announcePresence = function() {
     localStream = stream;
     beginWebRTC(outgoingPC);
   }, function(e){
+    alert("Error getting Video and Audio. Please try a refresh.");
     console.error(e);
   });
 };
@@ -269,7 +270,7 @@ $('#connect').click(function(){
 
   sharedKey = $('#rid').val();
   setFirebaseValues();
-  console.log('Connectiong to:', sharedKey)
+  console.log('Connecting to new room:', sharedKey)
 
   chatRef.off('child_added', chatChildAdded);
   announceRef.off('child_added', announceChildAdded);
@@ -278,7 +279,8 @@ $('#connect').click(function(){
 
   chatChildAdded = chatRef.on('child_added', handleChatMessage);
   announceChildAdded = announceRef.on('child_added', handleAnnouncement);
-  messageChildAdded = messageRef.endAt().limit(1).on('child_added', handleMessage);
+  messageChildAdded = messageRef.on('child_added', handleMessage);
+  firstMessage = false;
   
   initiateConnection();
   announcePresence();
@@ -299,7 +301,12 @@ var endCall = function(){
 
   outgoingPC.close();
   incomingPC.close();
+
+  // Clean up Firebase
   announceChild.remove();
+  for (var i = messages.length - 1; i >= 0; i--) {
+    messages[i].remove();
+  };
 }
 
 $('#hangup').click(function(){
@@ -308,11 +315,6 @@ $('#hangup').click(function(){
 
 window.onbeforeunload = function(e) {
   endCall();
-
-  // Clean up messages on Firebase
-  for (var i = messages.length - 1; i >= 0; i--) {
-    messages[i].remove();
-  };
 };
 
 
