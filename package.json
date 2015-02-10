@@ -4,10 +4,7 @@
   "description": "learning webrtc",
   "main": "dchannel.js",
   "dependencies": {
-    "body-parser": "^1.11.0",
-    "errorhandler": "^1.3.3",
-    "express": "^4.11.2",
-    "socket.io": "^1.3.2"
+    "express": "^4.11.2"
   },
   "devDependencies": {},
   "scripts": {

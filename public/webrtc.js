@@ -1,12 +1,14 @@
 var fb, announceRef, messageRef, chatRef = null;
 var setFirebaseValues = function(){
-  fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections/" + sharedKey);
+  fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections/" + roomID);
   announceRef = fb.child('announce');
   messageRef = fb.child('messages');
   chatRef = fb.child('chat');  
 };
 
-var sharedKey = $('#rid').val();
+// Room ID
+var roomID = Math.random().toString(36).substr(2, 12);
+$('#rid').val(roomID);
 setFirebaseValues();
 
 var id = Date.now() % 1000000;
@@ -24,15 +26,15 @@ if (navigator.webkitGetUserMedia) {
 
 
 // ANOUNCEMENT
-// TODO: Changing sharedKey does not work
+// TODO: Changing roomID does not work
 var announceChild = null;
 var announcePresence = function() {
   announceChild = announceRef.push({
-    sharedKey: sharedKey, 
+    roomID: roomID, 
     id: id
   });
   console.log("Announced:", {
-    sharedKey: sharedKey, 
+    roomID: roomID, 
     id: id
   });
 
@@ -52,7 +54,7 @@ var announcePresence = function() {
 
 var handleAnnouncement = function(snapshot){
   var data = snapshot.val();
-  if(data.sharedKey === sharedKey && data.id !== id){
+  if(data.roomID === roomID && data.id !== id){
     console.log("Matched with", data.id);
     remoteId = data.id;
 
@@ -268,9 +270,9 @@ $('#connect').click(function(){
   // TODO: Only one user gets to see both video feeds
   endCall();
 
-  sharedKey = $('#rid').val();
+  roomID = $('#rid').val();
   setFirebaseValues();
-  console.log('Connecting to new room:', sharedKey)
+  console.log('Connecting to new room:', roomID)
 
   chatRef.off('child_added', chatChildAdded);
   announceRef.off('child_added', announceChildAdded);
