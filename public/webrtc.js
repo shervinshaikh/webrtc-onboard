@@ -9,7 +9,7 @@ var setFirebaseValues = function(){
 var sharedKey = $('#rid').val();
 setFirebaseValues();
 
-var id = Date.now() % 100000;
+var id = Date.now() % 1000000;
 var remoteId, localStream, remoteStream = null;
 var stringId = id.toString();
 $('#pid').text(stringId.substr(0,3) + '-' + stringId.substr(3,6));
@@ -289,6 +289,11 @@ $('#connect').click(function(){
 $('#clear').click(function(){
   chatRef.remove();
   $('#messages').empty();
+});
+
+$('#mute').click(function(){
+  var isMuted = $('#remoteVideo').prop('muted');
+  $('#remoteVideo').prop('muted', !isMuted);
 });
 
 
