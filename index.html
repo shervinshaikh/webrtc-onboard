@@ -9,8 +9,6 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
   <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
-  <!--script src="//cdn.firebase.com/js/client/2.1.2/firebase.js"></script>
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script-->
   <script src="/webrtc.js"></script>
 
   <head>
@@ -21,19 +19,20 @@
     <div class="text-center" id="info">
       <p>Your ID: <b id="pid">{{pid}}</b><br/></p>
 
-      <p>Room: <input type="text" value="{{rid}}" id="rid" placeholder="Someone else's ID" style="color: black; width: 100px" ></input>
-      <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"></p>
+      <p>Room: <input type="text" ng-model="roomID" id="rid" placeholder="Someone else's ID" style="color: black; width: 100px" ></input>
+      <input class="submit btn btn-xs btn-default" type="button" value="Connect" ng-click="connect()"></p>
 
       <p>
         <button id="hangup" class="btn btn-xs btn-danger">Leave</button>
         <button id="mute" class="btn btn-xs btn-danger">Mute/Unmute</button>
       </p>
+    </div>
 
-      <hr>
+    <div class="text-center">
+      <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()">
     </div>
 
     <video id="localVideo" ng-src="{{localSrc}}" autoplay muted></video>
-    {{localSrc}}
-    <video id="remoteVideo" ng-src="{{remoteSrc}}" autoplay></video>
+    <video id="remoteVideo" ng-src="{{remoteSrc}}" ng-show="inVideoChat" autoplay></video>
   </body>
 </html>

@@ -1,19 +1,20 @@
-angular.module('Hermes', [])
-  .controller('videoChatController', function($scope) {
+angular.module('Hermes', []).controller('videoChatController', function($scope, $location) {
+  $scope.inVideoChat = false;
+
+  var loc = $location.search();
+  // Room ID
+  $scope.roomID = Math.random().toString(36).substr(2, 12);
+  if(loc.roomID){
+    console.log(loc.roomID);
+    $scope.roomID = loc.roomID;
+  } else {
+    $location.search('roomID', $scope.roomID);
+  }
 
   var fb, announceRef, messageRef, chatRef = null;
-  var setFirebaseValues = function(){
-    fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections/" + roomID);
-    announceRef = fb.child('announce');
-    messageRef = fb.child('messages');
-    chatRef = fb.child('chat');
-  };
-
-  // Room ID
-  var roomID = Math.random().toString(36).substr(2, 12);
-  // $('#rid').val(roomID);
-  $scope.rid = roomID;
-  setFirebaseValues();
+  fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections/" + $scope.roomID);
+  announceRef = fb.child('announce');
+  messageRef = fb.child('messages');
 
   var id = Date.now() % 1000000;
   var remoteId, localStream, remoteStream = null;
@@ -31,18 +32,18 @@ angular.module('Hermes', [])
 
 
   // ANOUNCEMENT
-  // TODO: Changing roomID does not work
   var announceChild = null;
   var announcePresence = function() {
     announceChild = announceRef.push({
-      roomID: roomID,
+      roomID: $scope.roomID,
       id: id
     });
     console.log("Announced:", {
-      roomID: roomID,
+      roomID: $scope.roomID,
       id: id
     });
 
+    // TODO: doing this on page load break something?
     navigator.webkitGetUserMedia({
       "audio": true,
       "video": true
@@ -60,7 +61,7 @@ angular.module('Hermes', [])
 
   var handleAnnouncement = function(snapshot){
     var data = snapshot.val();
-    if(data.roomID === roomID && data.id !== id){
+    if(data.roomID === $scope.roomID && data.id !== id){
       console.log("Matched with", data.id);
       remoteId = data.id;
 
@@ -102,7 +103,7 @@ angular.module('Hermes', [])
   var outgoingPC = null;
   var incomingPC = null;
   var channel = null;
-  var isConnectionReady = false;
+  $scope.isConnectionReady = false;
 
   // Options are not well supported on Chrome yet
   var channelOptions = {};
@@ -133,7 +134,8 @@ angular.module('Hermes', [])
       handleIceCandidate(e, incomingPC, false);
     };
 
-    isConnectionReady = true;
+    $scope.isConnectionReady = true;
+    console.log('Connection ready!');
     beginWebRTC(outgoingPC);
   };
 
@@ -142,6 +144,8 @@ angular.module('Hermes', [])
     console.log(e.stream);
     $('#remoteVideo')[0].src = URL.createObjectURL(e.stream);
     // $scope.remoteSrc = URL.createObjectURL(e.stream);
+    $scope.inVideoChat = true;
+    $scope.$apply();
   };
 
   var handleIceCandidateStateChange = function(peerConnection) {
@@ -171,15 +175,13 @@ angular.module('Hermes', [])
     console.error(e);
   };
 
-
-
-
+  // var messageChildAdded = messageRef.on('child_added', handleMessage);
+  var messageChildAdded = messageRef.on('child_added', handleMessage);
+  var firstMessage = false;
 
   var beginWebRTC = function(peerConnection){
-    console.log(localStream);
-    console.log(isConnectionReady);
-    console.log(remoteId);
-    if(localStream && isConnectionReady && remoteId){
+    console.log('connectionReady', $scope.isConnectionReady);
+    if(localStream && $scope.isConnectionReady && remoteId){
       outgoingPC.addStream(localStream);
 
       peerConnection.createOffer(function (offer) {
@@ -190,7 +192,27 @@ angular.module('Hermes', [])
     }
   };
 
-  var handleMessage = function(snapshot){
+  $scope.connect = function(){
+    endCall();
+    // TODO update firebase in separate function?
+    fb = new Firebase("https://webrtc-onboard.firebaseio.com/connections/" + $scope.roomID);
+    announceRef = fb.child('announce');
+    messageRef = fb.child('messages');
+    console.log('Connecting to new room:', $scope.roomID);
+
+    announceRef.off('child_added', announceChildAdded);
+    messageRef.off('child_added', messageChildAdded);
+    $('#messages').empty();
+
+    announceChildAdded = announceRef.on('child_added', handleAnnouncement);
+    messageChildAdded = messageRef.on('child_added', handleMessage);
+    firstMessage = false;
+
+    initiateConnection();
+    announcePresence();
+  };
+
+  function handleMessage(snapshot){
     if(firstMessage){
       firstMessage = false;
       return;
@@ -204,7 +226,7 @@ angular.module('Hermes', [])
         remoteId = data.sender;
 
         console.log("RECEIVED offer setRemoteDescription(offer)", "from", data.sender);
-        var sdpOffer = new RTCSessionDescription(data)
+        var sdpOffer = new RTCSessionDescription(data);
         incomingPC.setRemoteDescription(sdpOffer, onSdpSuccess, onSdpFailure);
 
         incomingPC.createAnswer(function (answer) {
@@ -231,16 +253,18 @@ angular.module('Hermes', [])
       case 'leave':
         console.warn("End call...");
         $('#remoteVideo')[0].src = "";
+        $scope.inVideoChat = false;
+        $scope.$apply();
 
         outgoingPC.close();
         incomingPC.close();
 
         remoteId = null;
-        isConnectionReady = false;
+        $scope.isConnectionReady = false;
         initiateConnection();
         break;
     }
-  };
+  }
 
   $('#mute').click(function(){
     var isMuted = $('#remoteVideo').prop('muted');
@@ -251,8 +275,11 @@ angular.module('Hermes', [])
 
   var endCall = function(){
     $('#remoteVideo')[0].src = "";
+    $scope.inVideoChat = false;
+    $scope.$apply();
+
     remoteId = null;
-    isConnectionReady = false;
+    $scope.isConnectionReady = false;
 
     sendMessage({type: 'leave'});
 
@@ -260,7 +287,7 @@ angular.module('Hermes', [])
     incomingPC.close();
 
     // Clean up Firebase
-    announceChild.remove();
+    if(announceChild !== null) announceChild.remove();
     for (var i = messages.length - 1; i >= 0; i--) {
       messages[i].remove();
     }
@@ -276,6 +303,6 @@ angular.module('Hermes', [])
 
 
   initiateConnection();
-  announcePresence();
+  // announcePresence();
 
 });
