@@ -7,7 +7,7 @@
   z-index: 1;
   position: absolute;
   object-fit: cover;
-  bottom: 0px;
+  bottom: 0;
 }
 
 #localVideo {

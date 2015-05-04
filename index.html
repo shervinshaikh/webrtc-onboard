@@ -1,11 +1,27 @@
 <!DOCTYPE html>
-<html>
-  <title>WebRTC Chat</title>
-	<body>
+<html lang="en" ng-app="Hermes">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/main.css">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+  <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+  <!--script src="//cdn.firebase.com/js/client/2.1.2/firebase.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script-->
+  <script src="/webrtc.js"></script>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Project Hermes</title>
+  </head>
+	<body ng-controller="videoChatController">
     <div class="text-center" id="info">
-      <p>Your ID: <b id="pid"></b><br/></p>
-    
-      <p>Room: <input type="text" id="rid" placeholder="Someone else's ID" style="color: black; width: 100px"></input>
+      <p>Your ID: <b id="pid">{{pid}}</b><br/></p>
+
+      <p>Room: <input type="text" value="{{rid}}" id="rid" placeholder="Someone else's ID" style="color: black; width: 100px" ></input>
       <input class="submit btn btn-xs btn-default" type="button" value="Connect" id="connect"></p>
 
       <p>
@@ -14,23 +30,10 @@
       </p>
 
       <hr>
-      <form id="send">
-        <input type="text" id="text" placeholder="Enter message"><input class="btn btn-default btn-xs" type="submit" value="Send">
-      </form>
-
-      <br/>
-      <div id="messages"></div>
-      <p><button class="btn btn-danger btn-xs" id="clear">Clear Chat</button><br/></p>      
     </div>
 
-    <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo" autoplay></video>
+    <video id="localVideo" ng-src="{{localSrc}}" autoplay muted></video>
+    {{localSrc}}
+    <video id="remoteVideo" ng-src="{{remoteSrc}}" autoplay></video>
   </body>
-
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/main.css">
-
-  <script src="//cdn.firebase.com/js/client/2.1.2/firebase.js"></script>
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
-  <script src="/webrtc.js"></script>
 </html>
