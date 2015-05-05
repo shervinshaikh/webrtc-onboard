@@ -4,7 +4,8 @@
   "description": "learning webrtc",
   "main": "dchannel.js",
   "dependencies": {
-    "express": "^4.11.2"
+    "express": "^4.11.2",
+    "fs": "0.0.2"
   },
   "devDependencies": {},
   "scripts": {

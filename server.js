@@ -1,6 +1,14 @@
 var express = require('express');
+var fs = require('fs');
 var app = express();
-var server = require('http').Server(app);
+
+var options = {
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.crt'),
+  requestCert: false,
+  rejectUnauthorized: false
+};
+var server = require('https').Server(options, app);
 
 app.set('port', (process.env.PORT || 5000));
 

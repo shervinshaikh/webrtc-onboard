@@ -305,4 +305,76 @@ angular.module('Hermes', []).controller('videoChatController', function($scope, 
   initiateConnection();
   // announcePresence();
 
+
+
+
+  // SCREENSHARE
+  // Go to https://dashboard.tokbox.com/ to get your OpenTok API Key and to generate
+  var apiKey    = '45229242',
+    sessionId = '1_MX40NTIyOTI0Mn5-MTQzMDg0MDExNTgxNH52WE1Zb1B4SVVQc3dsTFJRWEZSMEc3cnh-fg',
+    token     = 'T1==cGFydG5lcl9pZD00NTIyOTI0MiZzaWc9YzE2OWU2MGNkOTk2NGIxZTllNDFlYjI0YjQwZDhjMTQxODIyZmQ3Nzpyb2xlPXB1Ymxpc2hlciZzZXNzaW9uX2lkPTFfTVg0ME5USXlPVEkwTW41LU1UUXpNRGcwTURFeE5UZ3hOSDUyV0UxWmIxQjRTVlZRYzNkc1RGSlJXRVpTTUVjM2NuaC1mZyZjcmVhdGVfdGltZT0xNDMwODQwMTM5Jm5vbmNlPTAuNDA1NDE0Mjc3NDEzNDI0ODQmZXhwaXJlX3RpbWU9MTQzMzQzMjA3NyZjb25uZWN0aW9uX2RhdGE9';
+
+  var extensionId = 'mghlpfglfdbpbdjkmolkjmjfmibgcgmh';
+
+  var session = OT.initSession(apiKey, sessionId);
+
+  session.connect(token, function(error) {
+    // publish a stream using the camera and microphone:
+    // var publisher = OT.initPublisher('camera-publisher');
+    // session.publish(publisher);
+    // document.getElementById('shareBtn').disabled = false;
+  });
+
+  session.on('streamCreated', function(event) {
+    if (event.stream.videoType === 'screen') {
+      $scope.isScreenShare = true;
+      $scope.$apply();
+      console.log('isScreenShare', $scope.isScreenShare);
+      // This is a screen-sharing stream published by another client
+      var subOptions = {
+        width: event.stream.videoDimensions.width / 2,
+        height: event.stream.videoDimensions.height /2
+      };
+      session.subscribe(event.stream, 'screen-subscriber', subOptions);
+    }
+  });
+
+  // For Google Chrome only, register your extension by ID,
+  // You can find it at chrome://extensions once the extension is installed
+  OT.registerScreenSharingExtension('chrome', extensionId);
+
+  $scope.screenShare = function(){
+    OT.checkScreenSharingCapability(function(response) {
+      if (!response.supported || response.extensionRegistered === false) {
+        alert('This browser does not support screen sharing.');
+      } else if (response.extensionInstalled === false) {
+        alert('Please install the screen sharing extension and load this page over HTTPS.');
+      } else {
+        // Screen sharing is available. Publish the screen.
+        // Create an element, but do not display it in the HTML DOM:
+        var screenContainerElement = document.createElement('div');
+        var screenSharingPublisher = OT.initPublisher(
+          screenContainerElement,
+          { videoSource : 'screen' },
+          function(error) {
+            if (error) {
+              alert('Something went wrong: ' + error.message);
+            } else {
+              session.publish(
+                screenSharingPublisher,
+                function(error) {
+                  if (error) {
+                    alert('Something went wrong: ' + error.message);
+                  } else {
+                    $scope.isScreenShare = true;
+                    $scope.$apply();
+                    console.log('isScreenShare', $scope.isScreenShare);
+                  }
+              });
+          }
+        });
+      }
+    });
+  };
+
 });

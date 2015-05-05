@@ -41,3 +41,17 @@ p {
 .remoteText {
   text-align: left;
 }
+
+.screenshare-container {
+  height: 10em;
+  position: relative
+}
+.screen {
+  margin: 0;
+  background: yellow;
+  position: absolute;
+  /*top: 50%;*/
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, 0%)
+}
