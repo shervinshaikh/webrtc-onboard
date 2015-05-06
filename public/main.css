@@ -1,3 +1,27 @@
+.sidebar {
+  position:absolute;
+  top:0; bottom:0; left:0;
+  width:50px;
+  background:#000;
+}
+
+.images {
+  margin-left: 45px;
+}
+img {
+  border: 1px solid gray;
+}
+
+img:hover {
+    opacity: 0.4;
+    background-color: green;
+    /*filter: alpha(opacity=40); /* For IE8 and earlier */*/
+}
+
+.p1 {
+  /*position:;*/
+}
+
 #remoteVideo {
   height: 100%;
   width: 100%;
@@ -9,8 +33,11 @@
   object-fit: cover;
   bottom: 0;
 }
+.table {
+  width: 95%;
+}
 
-#localVideo {
+/*#localVideo {
   max-height: 20%;
   max-width: 20%;
   position: absolute;
@@ -18,6 +45,17 @@
   bottom: 20px;
   left: 20px;
   z-index: 2;
+}*/
+
+.table-condensed>tbody>tr>td, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>td, .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>td, .table-condensed>thead>tr>th {
+  padding: 0px;
+}
+
+.localVideo {
+  height: 400px;
+  width: 400px;
+  background-color: black;
+  border: 1px solid gray;
 }
 
 #info {

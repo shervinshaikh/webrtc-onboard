@@ -18,7 +18,7 @@
     <title>Project Hermes</title>
   </head>
 	<body ng-controller="videoChatController">
-    <div class="text-center" id="info">
+    <div class="text-center" id="info" ng-show="inVideoChat">
       <p>Your ID: <b id="pid">{{pid}}</b><br/></p>
 
       <p>Room: <input type="text" ng-model="roomID" id="rid" placeholder="Someone else's ID" style="color: black; width: 100px" ></input>
@@ -31,14 +31,38 @@
       </p>
     </div>
 
-    <div class="text-center">
-      <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare">
-    </div>
+    <nav class="navbar navbar-inverse">
+      <button>The Citrix Team</button>
+      <button>+</button>
+    </nav>
+    <!-- <div class="sidebar">
+      <table>
+        Hello2
+        Hello3
+        Hello4
+      </table>
+    </div> -->
+    <table class="images table table-condensed">
+      <tr>
+        <td ng-mouseover="hoverFace(1)"><div class="p1"></div><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isHover"></td>
+        <td ng-mouseover="hoverFace(2)"><div class="p2"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
+        <td ng-mouseover="hoverFace(3)"><div class="p3"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
+        <td ng-mouseover="hoverFace(4)"><div class="p5"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
+      </tr>
+      <tr>
+        <td ng-mouseover="hoverFace(5)"><div class="p4"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
+        <td ng-mouseover="hoverFace(6)"><div class="p5"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
+        <td ng-mouseover="hoverFace(7)"><div class="p6"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
+        <td ng-mouseover="hoverFace(8)"><video id="localVideo" class="localVideo" ng-src="{{localSrc}}" autoplay muted></video></td>
+      </tr>
 
-    <video id="localVideo" ng-src="{{localSrc}}" autoplay muted></video>
-    <div class="screenshare-container">
+
+    </table>
+
+    <!-- <video id="localVideo" ng-src="{{localSrc}}" autoplay muted></video> -->
+    <!-- <div class="screenshare-container">
       <div id="screen-subscriber" class="screen"></div>
-    </div>
+    </div> -->
     <video id="remoteVideo" ng-src="{{remoteSrc}}" ng-show="inVideoChat" autoplay></video>
   </body>
 </html>

@@ -307,6 +307,16 @@ angular.module('Hermes', []).controller('videoChatController', function($scope, 
 
 
 
+  $scope.hoverFace = function(n){
+    if(n === 8){
+      // Yourself
+    } else {
+      var divClass = "p" + n;
+    }
+    console.log('hover:', n);
+
+  };
+
 
   // SCREENSHARE
   // Go to https://dashboard.tokbox.com/ to get your OpenTok API Key and to generate
