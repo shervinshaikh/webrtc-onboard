@@ -18,51 +18,114 @@
     <title>Project Hermes</title>
   </head>
 	<body ng-controller="videoChatController">
+
     <div class="text-center" id="info" ng-show="inVideoChat">
-      <p>Your ID: <b id="pid">{{pid}}</b><br/></p>
-
-      <p>Room: <input type="text" ng-model="roomID" id="rid" placeholder="Someone else's ID" style="color: black; width: 100px" ></input>
-      <input class="submit btn btn-xs btn-default" type="button" value="Connect" ng-click="connect()"></p>
-
+      <!-- <p>Your ID: <b id="pid">{{pid}}</b><br/></p> -->
+      <!-- <p>Room: <input type="text" ng-model="roomID" id="rid" placeholder="Someone else's ID" style="color: black; width: 100px" ></input>
+      <input class="submit btn btn-xs btn-default" type="button" value="Connect" ng-click="connect()"></p> -->
       <p>
-        <button id="hangup" class="btn btn-xs btn-danger">Leave</button>
-        <button id="mute" class="btn btn-xs btn-danger">Mute/Unmute</button>
-        <button id="shareBtn" class="btn btn-default" ng-click="screenShare()">Share screen</button>
+        <button id="mute" class="btn btn-xs btn-danger">Mute</button>
       </p>
     </div>
 
-    <nav class="navbar navbar-inverse">
-      <button>The Citrix Team</button>
-      <button>+</button>
+
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Team Name</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li> -->
+            <li><a href="">+</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="">Camera</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
     </nav>
-    <!-- <div class="sidebar">
-      <table>
-        Hello2
-        Hello3
-        Hello4
-      </table>
+
+    <!-- <div>
+      <div class="paused text-center">
+      </div>
+      <div class="paused-text">
+        <p>Paused</p>
+        <p>for 02:34</p>
+      </div>
     </div> -->
-    <table class="images table table-condensed">
+
+    <table class="images table table-condensed" ng-hide="inVideoChat">
       <tr>
-        <td ng-mouseover="hoverFace(1)"><div class="p1"></div><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isHover"></td>
-        <td ng-mouseover="hoverFace(2)"><div class="p2"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
-        <td ng-mouseover="hoverFace(3)"><div class="p3"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
-        <td ng-mouseover="hoverFace(4)"><div class="p5"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
+        <td ng-mouseover="hoverFace(1)" ng-click="connect()">
+          <div id="overlay"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(2)" ng-click="connect()">
+          <div id="overlay"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(3)" ng-click="connect()">
+          <div id="overlay"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(4)" ng-click="connect()">
+          <div id="overlay"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
       </tr>
       <tr>
-        <td ng-mouseover="hoverFace(5)"><div class="p4"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
-        <td ng-mouseover="hoverFace(6)"><div class="p5"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
-        <td ng-mouseover="hoverFace(7)"><div class="p6"><img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare"></div></td>
-        <td ng-mouseover="hoverFace(8)"><video id="localVideo" class="localVideo" ng-src="{{localSrc}}" autoplay muted></video></td>
+        <td ng-mouseover="hoverFace(5)" ng-click="connect()">
+          <div id="overlay"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(6)" ng-click="connect()">
+          <div id="overlay"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(7)" ng-click="connect()">
+          <div id="overlay"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(8)" ng-click="connect()">
+          <div id="overlay"></div>
+          <!-- <video id="localVideo" class="localVideo" ng-src="{{localSrc}}" autoplay muted></video> -->
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
       </tr>
-
-
     </table>
 
     <!-- <video id="localVideo" ng-src="{{localSrc}}" autoplay muted></video> -->
     <!-- <div class="screenshare-container">
       <div id="screen-subscriber" class="screen"></div>
     </div> -->
-    <video id="remoteVideo" ng-src="{{remoteSrc}}" ng-show="inVideoChat" autoplay></video>
+    <div class="col-md-4" ng-show="inVideoChat">
+      <div class="col-md-2"></div>
+      <div class="col-md-4">
+        <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+      </div>
+      <div class="col-md-4">
+        <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+      </div>
+      <div class="col-md-2"></div>
+
+    </div>
+    <div class="col-md-8">
+      <div class="controls" ng-show="inVideoChat">
+        <button id="hangup" class="btn btn-danger">Leave</button>
+        <br/>
+        <br/>
+        <button id="shareBtn" class="btn btn-default" ng-click="screenShare()">Share screen</button>
+      </div>
+      <video id="localVideo" class="localVideo2" ng-src="{{localSrc}}" autoplay muted></video>
+      <video id="remoteVideo" ng-src="{{remoteSrc}}" ng-show="inVideoChat" autoplay></video>
+    </div>
   </body>
 </html>

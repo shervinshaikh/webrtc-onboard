@@ -5,47 +5,99 @@
   background:#000;
 }
 
-.images {
-  margin-left: 45px;
+.paused {
+ position: absolute;
+ background-color: green;
+ width: 100%;
+ height: 100%;
+ top: 0;
+ opacity: 0.5;
 }
+
+.paused-text {
+  position: absolute;
+  width: 100px;
+  height: 50px;
+  top: 50%;
+  left: 50%;
+  margin-left: -50px; /* margin is -0.5 * dimension */
+  margin-top: -25px;
+}
+
 img {
   border: 1px solid gray;
+  width:100%;
 }
 
-img:hover {
+/*td:hover {
     opacity: 0.4;
-    background-color: green;
-    /*filter: alpha(opacity=40); /* For IE8 and earlier */*/
+    background: linear-gradient(
+      rgba(255, 0, 0, 0.45),
+      rgba(255, 0, 0, 0.45)
+    ),
+    url(https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg);
+    /*filter: alpha(opacity=40); /* For IE8 and earlier */
+}*/
+
+#overlay {
+  display: none;
+  position: absolute;
 }
 
-.p1 {
-  /*position:;*/
+td:hover #overlay {
+  width: 421px;
+  height: 420px;
+  display: block;
+  position: absolute;
+  background-color: green;
+  opacity: 0.4;
+    /*background: linear-gradient(
+      rgba(255, 0, 0, 0.45),
+      rgba(255, 0, 0, 0.45)
+    );*/
 }
 
 #remoteVideo {
   height: 100%;
   width: 100%;
+/*  height: 20%;
+  width: 20%;
   max-height: 100%;
   max-width: 100%;
   display: block;
   z-index: 1;
   position: absolute;
   object-fit: cover;
-  bottom: 0;
-}
-.table {
-  width: 95%;
+  bottom: 0;*/
 }
 
-/*#localVideo {
+.controls {
+  z-index: 3;
+  position: absolute;
+  top: 30px;
+  left: 40px;
+}
+#info {
+  z-index: 3;
+  position: absolute;
+  /*background-color: rgba(0,0,0,0.7);*/
+  bottom: 40px;
+  right: 20px;
+  padding: 5px 10px 5px 10px;
+}
+.localVideo2 {
   max-height: 20%;
   max-width: 20%;
   position: absolute;
   border: 1px solid gray;
   bottom: 20px;
-  left: 20px;
+  right: 35px;
   z-index: 2;
-}*/
+}
+.inVideo {
+  width: 200px;
+  height: 200px;
+}
 
 .table-condensed>tbody>tr>td, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>td, .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>td, .table-condensed>thead>tr>th {
   padding: 0px;
@@ -58,14 +110,7 @@ img:hover {
   border: 1px solid gray;
 }
 
-#info {
-  z-index: 3;
-  position: absolute;
-  background-color: rgba(0,0,0,0.7);
-  top: 20px;
-  left: 20px;
-  padding: 5px 10px 5px 10px;
-}
+
 
 p {
   color: white;
