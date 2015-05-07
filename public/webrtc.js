@@ -1,4 +1,33 @@
-angular.module('Hermes', []).controller('videoChatController', function($scope, $location) {
+angular.module('Hermes', []).controller('videoChatController', function($scope, $location, $interval) {
+  $scope.hour = '00';
+  $scope.min = 30;
+  $scope.sec = 0;
+  var myInterval;
+
+  $scope.timer = function(){
+    console.log('timer')
+    $scope.min = 29;
+    $scope.sec = 59;
+    myInterval = $interval(function(){
+      console.log($scope.sec);
+      if($scope.sec == 0 && $scope.min > 0){
+        $scope.sec = 59;
+        $scope.min--;
+      } else if($scope.min <= 0){
+        $interval.cancel(myInterval);
+      } else {
+        $scope.sec--;
+      }
+      console.log($scope.sec);
+      $scope.$apply();
+    }, 1000);
+  };
+
+  $scope.stopInterval = function(){
+    $interval.cancel(myInterval);
+  }
+
+
   $scope.inVideoChat = false;
 
   var loc = $location.search();

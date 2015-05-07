@@ -234,3 +234,24 @@ p {
   margin-right: -50%;
   transform: translate(-50%, 0%)
 }
+
+.trans-btn {
+
+  border: #fff;
+  border-style: solid;;
+  border-width: 4px;
+  padding: 20px 90px 20px 90px;
+  border-radius: 0;
+  background-color: rgba(255,255,255,0);
+  font-size: 1.5em;
+  color: #fff;
+  margin-bottom: -24px;
+  width: 250px;
+
+}
+
+
+.trans-btn:hover {
+color: #fff;
+background-color: rgba(255,255,255,.25);
+}
