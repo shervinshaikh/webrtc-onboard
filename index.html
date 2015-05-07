@@ -75,33 +75,33 @@
     <table class="images table table-condensed" ng-hide="inVideoChat">
       <tr>
         <td ng-mouseover="hoverFace(1)" ng-click="connect()">
-          <div id="overlay"></div>
+          <div id="overlay"><img class="camera-face" src="/noun_25779_cc-.png" alt=""></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
         <td ng-mouseover="hoverFace(2)" ng-click="connect()">
-          <div id="overlay"></div>
+          <div id="overlay"><img class="camera-face" src="/noun_25779_cc-.png" alt=""></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
         <td ng-mouseover="hoverFace(3)" ng-click="connect()">
-          <div id="overlay"></div>
+          <div id="overlay"><img class="camera-face" src="/noun_25779_cc-.png" alt=""></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
         <td ng-mouseover="hoverFace(4)" ng-click="connect()">
-          <div id="overlay"></div>
+          <div id="overlay"><img class="camera-face" src="/noun_25779_cc-.png" alt=""></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
       </tr>
       <tr>
         <td ng-mouseover="hoverFace(5)" ng-click="connect()">
-          <div id="overlay"></div>
+          <div id="overlay"><img class="camera-face" src="/noun_25779_cc-.png" alt=""></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
         <td ng-mouseover="hoverFace(6)" ng-click="connect()">
-          <div id="overlay"></div>
+          <div id="overlay"><img class="camera-face" src="/noun_25779_cc-.png" alt=""></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
         <td ng-mouseover="hoverFace(7)" ng-click="connect()">
-          <div id="overlay"></div>
+          <div id="overlay"><img class="camera-face" src="/noun_25779_cc-.png" alt=""></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
         <td ng-mouseover="hoverFace(8)">
@@ -176,10 +176,15 @@
     </div>
     <div class="col-md-8">
       <div class="controls" ng-show="inVideoChat">
-        <button id="hangup" class="btn btn-danger">Leave</button>
+
+        <div class="cont">
+          <button id="hangup" class=""></button>
+          <img class="control-things" src="/hangup.png" alt="">
+        </div>
         <br/>
         <br/>
-        <button id="shareBtn" class="btn btn-default" ng-click="screenShare()">Share screen</button>
+        <img class="control-things" src="/screenshare.png" alt="">
+        <!-- <button id="shareBtn" class="btn btn-default" ng-click="screenShare()"><img src="/screenshare.png" alt=""></button> -->
       </div>
       <video id="localVideo" class="localVideo2" ng-src="{{localSrc}}" autoplay muted></video>
       <video id="remoteVideo" ng-src="{{remoteSrc}}" ng-show="inVideoChat" autoplay></video>

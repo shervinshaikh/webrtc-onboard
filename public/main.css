@@ -91,6 +91,12 @@
   background-color: #00A185;
 }
 
+.camera-face {
+  /*height: 80%;*/
+  width: 50%;
+  margin-left: 25%;
+  margin-top: 35%;
+}
 
 .icons {
   padding-top:10px;
@@ -104,7 +110,7 @@ p {
 
 
 img {
-  border: 1px solid gray;
+  /*border: 0.5px solid #2B3E51;*/
   width:100%;
 }
 
@@ -192,6 +198,15 @@ td:hover #overlay2 {
 }
 
 
+.control-things {
+  width: 65px;
+}
+#hangup {
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  opacity: 0;
+}
 
 p {
   color: white;
