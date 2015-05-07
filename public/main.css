@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Citrix Font";
+    src: url(http://yourcustompath/blahblah/Citrix-Sans.ttf) format("truetype");
+}
+
 .sidebar {
   position:absolute;
   top:0; bottom:0; left:0;
@@ -7,54 +12,130 @@
 
 .paused {
  position: absolute;
- background-color: green;
+ background-color: #00A185;
  width: 100%;
  height: 100%;
  top: 0;
- opacity: 0.5;
+ opacity: 0.9;
 }
-
 .paused-text {
   position: absolute;
-  width: 100px;
-  height: 50px;
+  width: 1680px;
+  height: 400px;
   top: 50%;
   left: 50%;
-  margin-left: -50px; /* margin is -0.5 * dimension */
-  margin-top: -25px;
+  margin-left: -840px; /* margin is -0.5 * dimension */
+  margin-top: -200px;
 }
+.back-team {
+  width: 588px;
+  height: 130px;
+  background-color: #3498DB;
+  color: #FFFFFF;
+  font-size: 36px;
+  border: 0px;
+  box-shadow: 4px 4px 0px #AFCADB;
+}
+.time-text {
+  /*padding-bottom: 80px;*/
+  font-size: 50px;
+}
+.time {
+  font-size: 20px;
+}
+.numbers {
+  font-size: 100px;
+  margin-bottom: -20px;
+}
+.note-text {
+  font-size: 35px;
+}
+
+.hour {
+  margin-right: 50px;
+}
+.min {
+  margin-left: 30px;
+  margin-right: 60px;
+}
+.sec {
+  margin-left:30px;
+}
+.navbar {
+  background-color: #ECF0F1;
+  min-height: 70px;
+  margin-bottom: 0;
+}
+.container-fluid {
+  margin-top:10px;
+}
+.navbar-brand {
+  font-size: 23px;
+  margin-top: -3px;
+  z-index: 2;
+  position: absolute;
+  margin-left: 0;
+}
+.text-nav {
+  padding-left: 18px;
+  padding-top:2px;
+  color: #FFFFFF;
+}
+.cover {
+  z-index: 1;
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  height: 71px;
+  width: 200px;
+  background-color: #00A185;
+}
+
+
+.icons {
+  padding-top:10px;
+  padding-right: 20px;
+  border: none;
+  max-width: 75%;
+}
+p {
+  font-family: "Citrix Font", Helvetica;
+}
+
 
 img {
   border: 1px solid gray;
   width:100%;
 }
 
-/*td:hover {
-    opacity: 0.4;
-    background: linear-gradient(
-      rgba(255, 0, 0, 0.45),
-      rgba(255, 0, 0, 0.45)
-    ),
-    url(https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg);
-    /*filter: alpha(opacity=40); /* For IE8 and earlier */
-}*/
-
+.you-overlay {
+  text-align: center;
+  padding-top: 25%;
+}
 #overlay {
   display: none;
   position: absolute;
 }
-
 td:hover #overlay {
   width: 421px;
   height: 420px;
   display: block;
   position: absolute;
-  background-color: green;
-  opacity: 0.4;
-    /*background: linear-gradient(
-      rgba(255, 0, 0, 0.45),
-      rgba(255, 0, 0, 0.45)
-    );*/
+  background-color: #00A185;
+  opacity: 0.8;
+}
+
+#overlay2 {
+  display: none;
+  position: absolute;
+}
+td:hover #overlay2 {
+  width: 264px;
+  height: 264px;
+  display: block;
+  position: absolute;
+  background-color: #00A185;
+  opacity: 0.8;
 }
 
 #remoteVideo {
@@ -95,8 +176,8 @@ td:hover #overlay {
   z-index: 2;
 }
 .inVideo {
-  width: 200px;
-  height: 200px;
+  width: 250px;
+  height: 250px;
 }
 
 .table-condensed>tbody>tr>td, .table-condensed>tbody>tr>th, .table-condensed>tfoot>tr>td, .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>td, .table-condensed>thead>tr>th {

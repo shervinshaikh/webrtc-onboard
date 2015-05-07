@@ -33,30 +33,44 @@
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Team Name</a>
+
+          <a class="navbar-brand" href="#"><span class="text-nav">Team Bravo</span></a>
+          <div class="cover"></div>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <!-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li> -->
-            <li><a href="">+</a></li>
+
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="">Camera</a></li>
+            <!-- <li><a href="">Picture of the Day</a></li>
+            <li><a href="">Settings</a></li> -->
+            <li><img class="icons" src="/noun_2190_cc.png" alt=""></li>
+            <li><img class="icons" src="/noun_10189_cc.png" alt=""></li>
+            <!-- <li><img class="icons" src="/noun_8070_cc.png" alt=""></li> -->
+            <li><img class="icons" src="/noun_10229_cc.png" alt=""></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
 
-    <!-- <div>
+    <div ng-show="isPaused" ng-click="isPaused = false">
       <div class="paused text-center">
       </div>
-      <div class="paused-text">
-        <p>Paused</p>
-        <p>for 02:34</p>
+      <div class="paused-text text-center">
+        <p class="time-text">
+          <p class="note-text">Your pond will be able to see you in</p>
+          <p class="numbers">02:34:21</p>
+          <p class="time">
+            <span class="hour">HOUR        </span>   <span class="min">MIN</span> <span class="sec">SEC</span>
+          </p>
+        </p>
+        <br/><br/>
+        <button class="back-team">Leap back!</button>
       </div>
-    </div> -->
+    </div>
 
     <table class="images table table-condensed" ng-hide="inVideoChat">
       <tr>
@@ -90,10 +104,17 @@
           <div id="overlay"></div>
           <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
         </td>
-        <td ng-mouseover="hoverFace(8)" ng-click="connect()">
-          <div id="overlay"></div>
+        <td ng-mouseover="hoverFace(8)">
+          <div id="overlay">
+            <div class="you-overlay">
+              <p>Pause for ...</p>
+              <button class="btn btn-default btn-lg" ng-click="isPaused = true">30 min</button><br/> <br/>
+              <button class="btn btn-default btn-lg">1 hour</button><br/> <br/>
+              <button class="btn btn-default btn-lg">2 hours</button>
+            </div>
+          </div>
           <!-- <video id="localVideo" class="localVideo" ng-src="{{localSrc}}" autoplay muted></video> -->
-          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-hide="isScreenShare || isVideoChat">
         </td>
       </tr>
     </table>
@@ -103,18 +124,54 @@
       <div id="screen-subscriber" class="screen"></div>
     </div> -->
     <div class="col-md-4" ng-show="inVideoChat">
-      <div class="col-md-2"></div>
-      <div class="col-md-4">
+      <table class="images table table-condensed" id="inVideoFaces">
+      <tr>
+        <td ng-mouseover="hoverFace(1)" ng-click="connect()">
+          <div id="overlay2"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(2)" ng-click="connect()">
+          <div id="overlay2"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+      </tr>
+      <tr>
+        <td ng-mouseover="hoverFace(5)" ng-click="connect()">
+          <div id="overlay2"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(6)" ng-click="connect()">
+          <div id="overlay2"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+      </tr>
+      <tr>
+        <td ng-mouseover="hoverFace(5)" ng-click="connect()">
+          <div id="overlay2"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+        <td ng-mouseover="hoverFace(6)" ng-click="connect()">
+          <div id="overlay2"></div>
+          <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" alt="" ng-click="connect()" ng-hide="isScreenShare || isVideoChat">
+        </td>
+      </tr>
+    </table>
+      <!-- <div class="col-md-1"></div> -->
+      <!-- <div class="col-md-6">
         <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <br/>
         <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <br/>
         <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
       </div>
-      <div class="col-md-4">
+      <div class="col-md-5">
         <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <br/>
         <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
+        <br/>
         <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/169/3ee/352f546.jpg" class="inVideo" alt="" ng-click="connect()" ng-hide="isScreenShare">
-      </div>
-      <div class="col-md-2"></div>
+      </div> -->
+      <!-- <div class="col-md-1"></div> -->
 
     </div>
     <div class="col-md-8">
