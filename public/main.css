@@ -239,13 +239,13 @@ p {
 
   border: #fff;
   border-style: solid;;
-  border-width: 4px;
+  border-width: 6px;
   padding: 20px 90px 20px 90px;
   border-radius: 0;
   background-color: rgba(255,255,255,0);
   font-size: 1.5em;
   color: #fff;
-  margin-bottom: -24px;
+  margin-bottom: -26px;
   width: 250px;
 
 }
@@ -254,4 +254,11 @@ p {
 .trans-btn:hover {
 color: #fff;
 background-color: rgba(255,255,255,.25);
+}
+
+.buttonstuff {
+  width:500px;
+}
+.leap {
+  font-size: 50px;
 }
