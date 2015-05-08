@@ -74,7 +74,7 @@ angular.module('Hermes', []).controller('videoChatController', function($scope, 
 
     // TODO: doing this on page load break something?
     navigator.webkitGetUserMedia({
-      "audio": true,
+      // "audio": true,
       "video": true
     }, function (stream){
       $('#localVideo')[0].src = URL.createObjectURL(stream);
